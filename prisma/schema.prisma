@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model User {
+  id                String      @id @default(uuid())
+  email             String      @unique
+  password          String
+  name              String?
+  role              Role        @default(USER)
+  profilePicture    String?
+  bio               String?
+  dateOfBirth       DateTime?
+  phoneNumber       String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  apiKeys           ApiKey[]
+  files             File[]
+  messages          Message[]
+  sentMessages      Message[]   @relation("SentMessages")
+  receivedMessages  Message[]   @relation("ReceivedMessages")
+  auditLogs         AuditLog[]
+  webhooks          Webhook[]
+  sessions          Session[]
+  impersonatedBy    User?       @relation("UserImpersonation", fields: [impersonatedById], references: [id])
+  impersonatedById  String?
+  impersonating     User[]      @relation("UserImpersonation")
+}
+
+model ApiKey {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime?
+}
+
+model File {
+  id        String   @id @default(uuid())
+  name      String
+  url       String
+  size      Int
+  type      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id           String   @id @default(uuid())
+  content      String
+  senderId     String
+  sender       User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId   String
+  receiver     User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  createdAt    DateTime @default(now())
+  readAt       DateTime?
+
+  User User[]
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  details   Json?
+  createdAt DateTime @default(now())
+}
+
+model Webhook {
+  id          String   @id @default(uuid())
+  url         String
+  events      String[]
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  lastTriggered DateTime?
+}
+
+enum Role {
+  USER
+  ADMIN
+}

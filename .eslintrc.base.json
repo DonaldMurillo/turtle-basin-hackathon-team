@@ -1,0 +1,106 @@
+{
+	"root": true,
+	"ignorePatterns": ["**/*"],
+	"plugins": ["@nx", "@typescript-eslint", "import", "react", "react-hooks", "jsx-a11y", "node"],
+	"extends": [
+		"eslint:recommended",
+		"plugin:@nx/react",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:react/recommended",
+		"plugin:react-hooks/recommended",
+		"plugin:jsx-a11y/recommended"
+	],
+	"overrides": [
+		{
+			"files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+			"parserOptions": {
+				"project": ["./tsconfig.app.json", "./tsconfig.spec.json"]
+			},
+			"rules": {
+				"@typescript-eslint/no-explicit-any": "error",
+				"@typescript-eslint/explicit-function-return-type": "error",
+				"@typescript-eslint/no-unused-vars": [
+					"error",
+					{
+						"argsIgnorePattern": "^_"
+					}
+				],
+				"import/order": [
+					"error",
+					{
+						"groups": ["builtin", "external", "internal", ["parent", "sibling"]],
+						"newlines-between": "always",
+						"alphabetize": {
+							"order": "asc",
+							"caseInsensitive": true
+						}
+					}
+				],
+				"no-console": [
+					"warn",
+					{
+						"allow": ["warn", "error"]
+					}
+				],
+				"prefer-const": "error",
+				"eqeqeq": ["error", "always"],
+				"react/prop-types": "off",
+				"react/react-in-jsx-scope": "off",
+				"react/jsx-filename-extension": [
+					"warn",
+					{
+						"extensions": [".tsx"]
+					}
+				],
+				"react-hooks/rules-of-hooks": "error",
+				"react-hooks/exhaustive-deps": "warn",
+				"react/jsx-curly-brace-presence": [
+					"error",
+					{
+						"props": "never",
+						"children": "never"
+					}
+				],
+				"react/self-closing-comp": [
+					"error",
+					{
+						"component": true,
+						"html": true
+					}
+				],
+				"node/exports-style": ["error", "module.exports"],
+				"node/prefer-global/buffer": ["error", "always"],
+				"node/prefer-global/console": ["error", "always"],
+				"node/prefer-global/process": ["error", "always"],
+				"node/prefer-promises/dns": "error",
+				"node/prefer-promises/fs": "error",
+				"@typescript-eslint/no-non-null-assertion": "warn",
+				"@typescript-eslint/no-inferrable-types": "warn",
+				"@typescript-eslint/no-empty-interface": "warn",
+				"@typescript-eslint/prefer-optional-chain": "error"
+			}
+		},
+		{
+			"files": ["*.ts", "*.tsx"],
+			"extends": ["plugin:@nx/typescript"],
+			"rules": {}
+		},
+		{
+			"files": ["*.js", "*.jsx"],
+			"extends": ["plugin:@nx/javascript"],
+			"rules": {}
+		},
+		{
+			"files": ["*.spec.ts", "*.spec.tsx", "*.spec.js", "*.spec.jsx"],
+			"env": {
+				"jest": true
+			},
+			"rules": {}
+		}
+	],
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	}
+}
