@@ -15,12 +15,11 @@ import { submitImageLocation } from './controllers/imageLocationController';
 import authRoutes from './routes/auth/authRoutes';
 import userImpersonationRoutes from './routes/auth/userImpersonationRoutes';
 import userProfileRoutes from './routes/userProfile/userProfileRoutes';
-import { pushToMapBox } from '../../lib/utils';
 
 require('dotenv').config();
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+//const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-console.log(process.env.OPENAI_API_KEY);
+//console.log(process.env.OPENAI_API_KEY);
 const app = express();
 app.use(cors());
 
@@ -30,11 +29,6 @@ app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 app.get('/api', (req, res) => {
 	res.send({ message: 'Welcome to api!' });
-});
-
-app.get('/hello', async (req, res) => {
-	await pushToMapBox(-80.03666359603103, 26.38736594693062);
-	res.send('sample');
 });
 
 app.use(
@@ -58,7 +52,7 @@ Stars shimmer with delight.<br>
 Whispers of the breeze,<br>
 Carry secrets through the trees.</p>
 `;
-
+/*
 app.get('/poem', async (req, res) => {
 	const completion = await openai.chat.completions.create({
 		model: 'gpt-4o-mini',
@@ -73,7 +67,7 @@ app.get('/poem', async (req, res) => {
 	console.log(completion.choices[0].message);
 	res.send(completion.choices[0].message);
 });
-
+*/
 app.post('/submit-image-location', submitImageLocation);
 
 const port = process.env.PORT || 3333;
