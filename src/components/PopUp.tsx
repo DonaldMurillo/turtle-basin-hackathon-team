@@ -1,21 +1,16 @@
 // components/PopUp.tsx
+import axios from 'axios';
 import { Plus } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 
-import defaultImage from "../assets/default-image.png"; // Ensure you have a default image in this path
+import defaultImage from '../assets/default-image.png'; // Ensure you have a default image in this path
 
 import { Button } from '@/components/ui/button';
-import {
-	Dialog,
-	DialogTrigger,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogFooter,
-	DialogClose,
-} from '@/components/ui/dialog';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 
 // Import a default image or use a data URL
+
+// axios.options('http//:localhost:3333');
 
 interface Location {
 	latitude: number;
@@ -37,14 +32,14 @@ const PopUp: React.FC = () => {
 			// Camera access
 			navigator.mediaDevices
 				.getUserMedia({ video: true })
-				.then((stream) => {
+				.then(stream => {
 					mediaStreamRef.current = stream;
 					if (videoRef.current) {
 						videoRef.current.srcObject = stream;
 						videoRef.current.play();
 					}
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.error('Error accessing camera: ', err);
 					setError('Unable to access camera.');
 					setIsCameraActive(false);
@@ -53,25 +48,25 @@ const PopUp: React.FC = () => {
 			// Location access
 			if (navigator.geolocation) {
 				navigator.geolocation.getCurrentPosition(
-					(position) => {
+					position => {
 						setLocation({
 							latitude: position.coords.latitude,
 							longitude: position.coords.longitude,
 						});
 					},
-					(err) => {
+					err => {
 						console.error('Error accessing location: ', err);
-						setError((prev) => (prev ? prev + ' Unable to access location.' : 'Unable to access location.'));
+						setError(prev => (prev ? prev + ' Unable to access location.' : 'Unable to access location.'));
 					}
 				);
 			} else {
-				setError((prev) => (prev ? prev + ' Geolocation is not supported by this browser.' : 'Geolocation is not supported by this browser.'));
+				setError(prev => (prev ? prev + ' Geolocation is not supported by this browser.' : 'Geolocation is not supported by this browser.'));
 			}
 		}
 
 		return () => {
 			if (mediaStreamRef.current) {
-				mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+				mediaStreamRef.current.getTracks().forEach(track => track.stop());
 			}
 		};
 	}, [isCameraActive]);
@@ -94,7 +89,7 @@ const PopUp: React.FC = () => {
 				}
 				setIsCameraActive(false);
 				if (mediaStreamRef.current) {
-					mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+					mediaStreamRef.current.getTracks().forEach(track => track.stop());
 				}
 			} else {
 				setCapturedImage(null);
@@ -111,19 +106,24 @@ const PopUp: React.FC = () => {
 		setIsCameraActive(true);
 	};
 
-	const handleSubmit = () => {
-		if (capturedImage && capturedImage !== 'data:,') {
-			console.log('Captured Image:', capturedImage);
-		} else {
-			console.log('Captured Image:', defaultImage);
+	const handleSubmit = async () => {
+		if (!capturedImage && !location) {
+			setError('No image captured or location available.');
+			return;
 		}
 
-		if (location) {
-			console.log('User Location:', location);
-		} else {
-			console.log('Location not available.');
+		try {
+			const response = await axios.post('http://localhost:3333/submit-image-location', {
+				image: capturedImage || defaultImage,
+				location: location || { latitude: null, longitude: null },
+			});
+
+			console.log('Submission successful:', response.data);
+			// Handle successful submission (e.g., show a success message)
+		} catch (error) {
+			console.error('Error submitting data:', error);
+			setError('Failed to submit data. Please try again.');
 		}
-		// The modal will close automatically via DialogClose
 	};
 
 	return (
@@ -139,20 +139,12 @@ const PopUp: React.FC = () => {
 						<DialogTitle>Camera and Location Modal</DialogTitle>
 					</DialogHeader>
 					<div className="mt-4 flex flex-col items-center">
-						{error && (
-							<p className="text-red-500 mb-4 text-center">{error}</p>
-						)}
+						{error && <p className="text-red-500 mb-4 text-center">{error}</p>}
 						{!capturedImage && (
 							<>
 								{isCameraActive ? (
 									<div className="flex flex-col items-center">
-										<video
-											ref={videoRef}
-											className="w-full max-w-md"
-											autoPlay
-											playsInline
-											muted
-										/>
+										<video ref={videoRef} className="w-full max-w-md" autoPlay playsInline muted />
 										<Button onClick={handleCapture} className="mt-4">
 											Take Picture
 										</Button>
@@ -166,11 +158,7 @@ const PopUp: React.FC = () => {
 						)}
 						{capturedImage && (
 							<div className="flex flex-col items-center">
-								<img
-									src={capturedImage !== 'data:,' ? capturedImage : defaultImage}
-									alt="Captured"
-									className="w-full max-w-md"
-								/>
+								<img src={capturedImage !== 'data:,' ? capturedImage : defaultImage} alt="Captured" className="w-full max-w-md" />
 								<Button
 									onClick={() => {
 										setCapturedImage(null);

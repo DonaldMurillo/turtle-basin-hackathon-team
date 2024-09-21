@@ -2,30 +2,39 @@
  * This is not a production server yet!
  * This is only a minimal backend to get started.
  */
-require('dotenv').config();
 import * as path from 'path';
 
+import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
+import OpenAI from 'openai';
 import swaggerUi from 'swagger-ui-express';
 
 import { swaggerSpec } from './config/swagger';
+import { submitImageLocation } from './controllers/imageLocationController';
 import authRoutes from './routes/auth/authRoutes';
 import userImpersonationRoutes from './routes/auth/userImpersonationRoutes';
 import userProfileRoutes from './routes/userProfile/userProfileRoutes';
+import { pushToMapBox } from '../../lib/utils';
 
-import OpenAI from 'openai';
+require('dotenv').config();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 console.log(process.env.OPENAI_API_KEY);
 const app = express();
+app.use(cors());
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 app.get('/api', (req, res) => {
 	res.send({ message: 'Welcome to api!' });
+});
+
+app.get('/hello', async (req, res) => {
+	await pushToMapBox(-80.03666359603103, 26.38736594693062);
+	res.send('sample');
 });
 
 app.use(
@@ -64,6 +73,8 @@ app.get('/poem', async (req, res) => {
 	console.log(completion.choices[0].message);
 	res.send(completion.choices[0].message);
 });
+
+app.post('/submit-image-location', submitImageLocation);
 
 const port = process.env.PORT || 3333;
 const server = app.listen(port, () => {
