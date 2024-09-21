@@ -2,7 +2,7 @@
  * This is not a production server yet!
  * This is only a minimal backend to get started.
  */
-
+require('dotenv').config();
 import * as path from 'path';
 
 import express from 'express';
@@ -14,6 +14,10 @@ import authRoutes from './routes/auth/authRoutes';
 import userImpersonationRoutes from './routes/auth/userImpersonationRoutes';
 import userProfileRoutes from './routes/userProfile/userProfileRoutes';
 
+import OpenAI from 'openai';
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+console.log(process.env.OPENAI_API_KEY);
 const app = express();
 
 app.use(express.json());
@@ -33,10 +37,33 @@ app.use(
 	})
 );
 
-app.use('/auth', authRoutes);
-app.use('/auth', userImpersonationRoutes);
-app.use('/', userProfileRoutes);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// app.use('/auth', authRoutes);
+//app.use('/auth', userImpersonationRoutes);
+//app.use('/', userProfileRoutes);
+//app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+const poem = `
+<h1>A Quiet Night</h1>
+<p>In the quiet of the night,<br>
+Stars shimmer with delight.<br>
+Whispers of the breeze,<br>
+Carry secrets through the trees.</p>
+`;
+
+app.get('/poem', async (req, res) => {
+	const completion = await openai.chat.completions.create({
+		model: 'gpt-4o-mini',
+		messages: [
+			{ role: 'system', content: 'You are a helpful assistant.' },
+			{
+				role: 'user',
+				content: 'Write a haiku about recursion in programming.',
+			},
+		],
+	});
+	console.log(completion.choices[0].message);
+	res.send(completion.choices[0].message);
+});
 
 const port = process.env.PORT || 3333;
 const server = app.listen(port, () => {
