@@ -15,6 +15,7 @@ import { submitImageLocation } from './controllers/imageLocationController';
 import authRoutes from './routes/auth/authRoutes';
 import userImpersonationRoutes from './routes/auth/userImpersonationRoutes';
 import userProfileRoutes from './routes/userProfile/userProfileRoutes';
+import { pushToMapBox } from '../../lib/utils';
 
 require('dotenv').config();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -29,6 +30,11 @@ app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 app.get('/api', (req, res) => {
 	res.send({ message: 'Welcome to api!' });
+});
+
+app.get('/hello', async (req, res) => {
+	await pushToMapBox(-80.03666359603103, 26.38736594693062);
+	res.send('sample');
 });
 
 app.use(
