@@ -9,6 +9,7 @@ import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import { AppProvider } from '../contexts/AppContext';
 import { UserProvider } from '../contexts/UserContext';
+import AppMap from './pages/Map';
 
 export function App() {
 	return (
@@ -23,6 +24,7 @@ export function App() {
 							<Route path="/account" element={<Account />} />
 							<Route path="/forgot-password" element={<ForgotPassword />} />
 							<Route path="/new-route" element={<NewRoute />} />
+							<Route path="/map" element={<AppMap />} />
 						</Routes>
 					</div>
 				</Router>
