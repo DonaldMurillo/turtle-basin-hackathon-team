@@ -11,7 +11,7 @@ import OpenAI from 'openai';
 import swaggerUi from 'swagger-ui-express';
 
 import { swaggerSpec } from './config/swagger';
-import { pushToMapBox, submitImageLocation } from './controllers/imageLocationController';
+import { submitImageLocation } from './controllers/imageLocationController';
 import authRoutes from './routes/auth/authRoutes';
 import userImpersonationRoutes from './routes/auth/userImpersonationRoutes';
 import userProfileRoutes from './routes/userProfile/userProfileRoutes';

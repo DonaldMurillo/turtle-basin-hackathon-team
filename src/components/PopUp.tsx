@@ -119,6 +119,7 @@ const PopUp: React.FC = () => {
 			});
 
 			console.log('Submission successful:', response.data);
+
 			// Handle successful submission (e.g., show a success message)
 		} catch (error) {
 			console.error('Error submitting data:', error);

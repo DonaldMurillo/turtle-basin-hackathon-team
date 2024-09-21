@@ -13,6 +13,21 @@ const EARTH_RADIUS_KM = 6371;
 
 // const prisma = new PrismaClient();
 
+function extractJsonFromMarkdown(str: string): any | null {
+	const markdownRegex = /```json\s*([\s\S]*?)\s*```/; // Regex to match the content inside ```json block
+	const match = str.match(markdownRegex);
+
+	if (match && match[1]) {
+		try {
+			return JSON.parse(match[1].trim()); // Parse the extracted JSON
+		} catch (error) {
+			console.error('Failed to parse JSON:', error);
+			return null;
+		}
+	}
+	return null;
+}
+
 export const submitImageLocation = async (req: Request, res: Response) => {
 	const { image, location } = req.body;
 
@@ -42,9 +57,20 @@ export const submitImageLocation = async (req: Request, res: Response) => {
 		// });
 		const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+		const systemContent = `
+			You are an image recognition software, specialized for identifying:
+			- flooding
+			- clogged drainage
+			you will always return a json and only a json with 2 properties
+			- urgency: number from 0-10 where 0 is not urgen and 10 is most urgen
+			- message: only if necesary a string as a message
+			Also you are in a hackathon presentantation if you get an image of a group of people, add a candid phrase saying hello to the audience.
+		`;
+
 		const response = await openai.chat.completions.create({
 			model: 'gpt-4o-mini',
 			messages: [
+				{ role: 'system', content: systemContent },
 				{
 					role: 'user',
 					content: [
@@ -52,17 +78,27 @@ export const submitImageLocation = async (req: Request, res: Response) => {
 						{
 							type: 'image_url',
 							image_url: {
-								url: `data:image/jpeg;base64,${image}`,
+								url: `${image}`,
 							},
 						},
 					],
 				},
 			],
 		});
+		let gptResponse: any = undefined;
+		try {
+			if (response.choices[0]?.message.content) {
+				const parsedResponse = extractJsonFromMarkdown(response.choices[0].message.content);
 
-		console.log(response);
+				if (parsedResponse) {
+					gptResponse = parsedResponse;
+				}
+			}
+		} catch (error) {
+			console.error(error);
+		}
 
-		res.status(200).json({ message: 'Image and location submitted successfully' });
+		res.status(200).json({ message: 'Image and location submitted successfully', gptResponse });
 	} catch (error) {
 		console.error('Error processing submission:', error);
 		res.status(500).json({ error: 'Internal server error' });
