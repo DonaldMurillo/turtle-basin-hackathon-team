@@ -101,3 +101,10 @@ enum Role {
   USER
   ADMIN
 }
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  path      String
+  createdAt DateTime @default(now())
+}

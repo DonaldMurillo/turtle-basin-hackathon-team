@@ -12,10 +12,10 @@ import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger';
 import authRoutes from './routes/auth/authRoutes';
 import userImpersonationRoutes from './routes/auth/userImpersonationRoutes';
+import { setupImageEndpoints } from './routes/images/images';
 import userProfileRoutes from './routes/userProfile/userProfileRoutes';
 
 const app = express();
-
 app.use(express.json());
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
@@ -37,6 +37,8 @@ app.use('/auth', authRoutes);
 app.use('/auth', userImpersonationRoutes);
 app.use('/', userProfileRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+setupImageEndpoints(app);
 
 const port = process.env.PORT || 3333;
 const server = app.listen(port, () => {
