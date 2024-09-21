@@ -11,11 +11,10 @@ import OpenAI from 'openai';
 import swaggerUi from 'swagger-ui-express';
 
 import { swaggerSpec } from './config/swagger';
-import { submitImageLocation } from './controllers/imageLocationController';
+import { pushToMapBox, submitImageLocation } from './controllers/imageLocationController';
 import authRoutes from './routes/auth/authRoutes';
 import userImpersonationRoutes from './routes/auth/userImpersonationRoutes';
 import userProfileRoutes from './routes/userProfile/userProfileRoutes';
-import { pushToMapBox } from '../../lib/utils';
 
 require('dotenv').config();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
