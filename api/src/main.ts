@@ -2,19 +2,20 @@
  * This is not a production server yet!
  * This is only a minimal backend to get started.
  */
-require('dotenv').config();
 import * as path from 'path';
 
 import express from 'express';
 import session from 'express-session';
+import OpenAI from 'openai';
 import swaggerUi from 'swagger-ui-express';
 
 import { swaggerSpec } from './config/swagger';
 import authRoutes from './routes/auth/authRoutes';
 import userImpersonationRoutes from './routes/auth/userImpersonationRoutes';
 import userProfileRoutes from './routes/userProfile/userProfileRoutes';
+import { pushToMapBox } from '../../lib/utils';
 
-import OpenAI from 'openai';
+require('dotenv').config();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 console.log(process.env.OPENAI_API_KEY);
@@ -26,6 +27,11 @@ app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 app.get('/api', (req, res) => {
 	res.send({ message: 'Welcome to api!' });
+});
+
+app.get('/hello', async (req, res) => {
+	await pushToMapBox(-80.03666359603103, 26.38736594693062);
+	res.send('sample');
 });
 
 app.use(
