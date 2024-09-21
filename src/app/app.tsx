@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
+import About from './pages/About';
 import Account from './pages/Account';
 import ForgotPassword from './pages/ForgotPassword';
 import Home from './pages/Home';
@@ -9,6 +10,7 @@ import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import { AppProvider } from '../contexts/AppContext';
 import { UserProvider } from '../contexts/UserContext';
+
 import PopUp from '@/src/components/PopUp';
 
 export function App() {
@@ -25,7 +27,7 @@ export function App() {
 							<Route path="/forgot-password" element={<ForgotPassword />} />
 							<Route path="/new-route" element={<NewRoute />} />
 							<Route path="/popup" element={<PopUp />} />
-
+							<Route path="/about" element={<About />} />
 						</Routes>
 					</div>
 				</Router>
