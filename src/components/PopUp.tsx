@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { Plus } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
+import { toast } from 'sonner';
 
 import defaultImage from '../assets/default-image.png'; // Ensure you have a default image in this path
 
@@ -119,9 +120,12 @@ const PopUp: React.FC = () => {
 			});
 
 			console.log('Submission successful:', response.data);
+
+			toast.success(`Urgency: ${response.data.gptResponse.urgency}.\n Comment: ${response.data.gptResponse.message}`);
 			// Handle successful submission (e.g., show a success message)
 		} catch (error) {
 			console.error('Error submitting data:', error);
+			toast.error('something went wrong');
 			setError('Failed to submit data. Please try again.');
 		}
 	};
