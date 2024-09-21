@@ -1,13 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import PopUp from '@/src/components/PopUp';
+
+import AppMap from './Map';
+
 import MainLayout from '@/components/layouts/MainLayout';
 import { Button } from '@/components/ui/button';
-import AppMap from './Map';
+import Navbar from '@/src/components/Navbar';
+import PopUp from '@/src/components/PopUp';
 
 export default function Home() {
 	return (
 		<>
+			<Navbar />
 			<AppMap />
 			{/* PopUp Component Positioned at Lower Right */}
 			<div className="absolute bottom-4 right-4">
