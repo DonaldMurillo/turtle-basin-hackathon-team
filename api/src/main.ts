@@ -4,16 +4,10 @@
  */
 import * as path from 'path';
 
-import Datasets from '@mapbox/mapbox-sdk';
-import mbxClient from '@mapbox/mapbox-sdk';
-import datasetsClient from '@mapbox/mapbox-sdk/services/datasets';
 import express from 'express';
 import session from 'express-session';
-import { Feature, Geometry } from 'geojson';
-import { Point } from 'mapbox-gl';
 import OpenAI from 'openai';
 import swaggerUi from 'swagger-ui-express';
-import { v4 as uuidv4 } from 'uuid';
 
 import { swaggerSpec } from './config/swagger';
 import authRoutes from './routes/auth/authRoutes';
@@ -22,7 +16,7 @@ import userProfileRoutes from './routes/userProfile/userProfileRoutes';
 import { pushToMapBox } from '../../lib/utils';
 
 require('dotenv').config();
-//const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 console.log(process.env.OPENAI_API_KEY);
 const app = express();
@@ -53,7 +47,7 @@ app.use(
 //app.use('/auth', userImpersonationRoutes);
 //app.use('/', userProfileRoutes);
 //app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-/*
+
 const poem = `
 <h1>A Quiet Night</h1>
 <p>In the quiet of the night,<br>
@@ -76,7 +70,6 @@ app.get('/poem', async (req, res) => {
 	console.log(completion.choices[0].message);
 	res.send(completion.choices[0].message);
 });
-*/
 
 const port = process.env.PORT || 3333;
 const server = app.listen(port, () => {
