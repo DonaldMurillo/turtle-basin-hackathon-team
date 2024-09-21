@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import PopUp from '@/src/components/PopUp';
 import MainLayout from '@/components/layouts/MainLayout';
 import { Button } from '@/components/ui/button';
 
@@ -30,19 +30,17 @@ export default function Home() {
 
 			<div className="bg-gray-100">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-24">
-					<div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-						{[
-							{ title: 'Feature 1', description: 'Description of feature 1' },
-							{ title: 'Feature 2', description: 'Description of feature 2' },
-							{ title: 'Feature 3', description: 'Description of feature 3' },
-						].map((feature, index) => (
-							<div key={index} className="bg-white overflow-hidden shadow rounded-lg">
-								<div className="px-4 py-5 sm:p-6">
-									<h3 className="text-lg font-medium text-gray-900">{feature.title}</h3>
-									<p className="mt-1 text-sm text-gray-500">{feature.description}</p>
-								</div>
-							</div>
-						))}
+					<div className="relative bg-gray-100 border border-gray-300 rounded-lg p-6 h-64">
+						{/* Content inside the rectangle */}
+						<p className="text-gray-700">
+							This is a rectangle container. You can place any content here. The PopUp button is positioned at the lower
+							right corner.
+						</p>
+
+						{/* PopUp Component Positioned at Lower Right */}
+						<div className="absolute bottom-4 right-4">
+							<PopUp />
+						</div>
 					</div>
 				</div>
 			</div>
