@@ -1,6 +1,8 @@
 // import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 
+import { pushToMapBox } from '@/lib/utils';
+
 // const prisma = new PrismaClient();
 
 export const submitImageLocation = async (req: Request, res: Response) => {
@@ -17,6 +19,10 @@ export const submitImageLocation = async (req: Request, res: Response) => {
 		console.log('Received image data:', image.substring(0, 50) + '...');
 		console.log('Received location:', location);
 
+		if (location.latitude && location.longitude) {
+			console.log('elooo');
+			await pushToMapBox(location.latitude, location.longitude);
+		}
 		// Example of saving to database (uncomment and adjust as needed):
 		// const submission = await prisma.imageSubmission.create({
 		//   data: {
