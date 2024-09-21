@@ -1,6 +1,9 @@
 // components/PopUp.tsx
 import { Plus } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
+
+import defaultImage from "../assets/default-image.png"; // Ensure you have a default image in this path
+
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -12,16 +15,26 @@ import {
 	DialogClose,
 } from '@/components/ui/dialog';
 
+// Import a default image or use a data URL
+
+interface Location {
+	latitude: number;
+	longitude: number;
+}
+
 const PopUp: React.FC = () => {
 	const [isCameraActive, setIsCameraActive] = useState(false);
 	const [capturedImage, setCapturedImage] = useState<string | null>(null);
+	const [location, setLocation] = useState<Location | null>(null);
+	const [error, setError] = useState<string | null>(null);
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const mediaStreamRef = useRef<MediaStream | null>(null);
 
-	// Start camera when isCameraActive is true
+	// Start camera and get location when isCameraActive is true
 	useEffect(() => {
 		if (isCameraActive) {
+			// Camera access
 			navigator.mediaDevices
 				.getUserMedia({ video: true })
 				.then((stream) => {
@@ -33,8 +46,27 @@ const PopUp: React.FC = () => {
 				})
 				.catch((err) => {
 					console.error('Error accessing camera: ', err);
+					setError('Unable to access camera.');
 					setIsCameraActive(false);
 				});
+
+			// Location access
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(
+					(position) => {
+						setLocation({
+							latitude: position.coords.latitude,
+							longitude: position.coords.longitude,
+						});
+					},
+					(err) => {
+						console.error('Error accessing location: ', err);
+						setError((prev) => (prev ? prev + ' Unable to access location.' : 'Unable to access location.'));
+					}
+				);
+			} else {
+				setError((prev) => (prev ? prev + ' Geolocation is not supported by this browser.' : 'Geolocation is not supported by this browser.'));
+			}
 		}
 
 		return () => {
@@ -54,22 +86,43 @@ const PopUp: React.FC = () => {
 			if (ctx) {
 				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 				const dataUrl = canvas.toDataURL('image/png');
-				setCapturedImage(dataUrl);
+				if (dataUrl && dataUrl !== 'data:,') {
+					setCapturedImage(dataUrl);
+				} else {
+					setCapturedImage(null);
+					setError('Failed to capture image.');
+				}
 				setIsCameraActive(false);
 				if (mediaStreamRef.current) {
 					mediaStreamRef.current.getTracks().forEach((track) => track.stop());
 				}
+			} else {
+				setCapturedImage(null);
+				setError('Failed to get canvas context. Submitting default image.');
 			}
+		} else {
+			setCapturedImage(null);
+			setError('Video or Canvas element not found. Submitting default image.');
 		}
 	};
 
-	const handleShareCamera = () => {
+	const handleShareCameraAndLocation = () => {
+		setError(null);
 		setIsCameraActive(true);
 	};
 
 	const handleSubmit = () => {
-		// Handle the captured image as needed
-		console.log('Captured Image:', capturedImage);
+		if (capturedImage && capturedImage !== 'data:,') {
+			console.log('Captured Image:', capturedImage);
+		} else {
+			console.log('Captured Image:', defaultImage);
+		}
+
+		if (location) {
+			console.log('User Location:', location);
+		} else {
+			console.log('Location not available.');
+		}
 		// The modal will close automatically via DialogClose
 	};
 
@@ -83,32 +136,47 @@ const PopUp: React.FC = () => {
 				</DialogTrigger>
 				<DialogContent className="sm:max-w-lg">
 					<DialogHeader>
-						<DialogTitle>Camera Modal</DialogTitle>
+						<DialogTitle>Camera and Location Modal</DialogTitle>
 					</DialogHeader>
 					<div className="mt-4 flex flex-col items-center">
+						{error && (
+							<p className="text-red-500 mb-4 text-center">{error}</p>
+						)}
 						{!capturedImage && (
 							<>
 								{isCameraActive ? (
 									<div className="flex flex-col items-center">
-										<video ref={videoRef} className="w-full max-w-md" />
+										<video
+											ref={videoRef}
+											className="w-full max-w-md"
+											autoPlay
+											playsInline
+											muted
+										/>
 										<Button onClick={handleCapture} className="mt-4">
 											Take Picture
 										</Button>
 									</div>
 								) : (
-									<Button onClick={handleShareCamera} className="w-full">
-										Share Camera
+									<Button onClick={handleShareCameraAndLocation} className="w-full">
+										Share Camera and Location
 									</Button>
 								)}
 							</>
 						)}
 						{capturedImage && (
 							<div className="flex flex-col items-center">
-								<img src={capturedImage} alt="Captured" className="w-full max-w-md" />
+								<img
+									src={capturedImage !== 'data:,' ? capturedImage : defaultImage}
+									alt="Captured"
+									className="w-full max-w-md"
+								/>
 								<Button
 									onClick={() => {
 										setCapturedImage(null);
 										setIsCameraActive(true); // Activate camera for retake
+										setLocation(null); // Reset location
+										setError(null); // Reset errors
 									}}
 									className="mt-4"
 								>
