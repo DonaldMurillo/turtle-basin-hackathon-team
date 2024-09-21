@@ -11,6 +11,7 @@ import SignUp from './pages/SignUp';
 import { AppProvider } from '../contexts/AppContext';
 import { UserProvider } from '../contexts/UserContext';
 
+import { Toaster } from '@/components/ui/toaster';
 import PopUp from '@/src/components/PopUp';
 
 export function App() {

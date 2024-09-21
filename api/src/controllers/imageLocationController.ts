@@ -14,17 +14,22 @@ const EARTH_RADIUS_KM = 6371;
 // const prisma = new PrismaClient();
 
 function extractJsonFromMarkdown(str: string): any | null {
-	const markdownRegex = /```json\s*([\s\S]*?)\s*```/; // Regex to match the content inside ```json block
-	const match = str.match(markdownRegex);
+	try {
+		return JSON.parse(str);
+	} catch (error) {
+		const markdownRegex = /```json\s*([\s\S]*?)\s*```/; // Regex to match the content inside ```json block
+		const match = str.match(markdownRegex);
 
-	if (match && match[1]) {
-		try {
-			return JSON.parse(match[1].trim()); // Parse the extracted JSON
-		} catch (error) {
-			console.error('Failed to parse JSON:', error);
-			return null;
+		if (match && match[1]) {
+			try {
+				return JSON.parse(match[1].trim()); // Parse the extracted JSON
+			} catch (error) {
+				console.error('Failed to parse JSON:', error);
+				return null;
+			}
 		}
 	}
+
 	return null;
 }
 
@@ -74,7 +79,7 @@ export const submitImageLocation = async (req: Request, res: Response) => {
 				{
 					role: 'user',
 					content: [
-						{ type: 'text', text: 'What’s in this image?' },
+						{ type: 'text', text: 'Whats the urgency for this picture?' },
 						{
 							type: 'image_url',
 							image_url: {
@@ -87,6 +92,7 @@ export const submitImageLocation = async (req: Request, res: Response) => {
 		});
 		let gptResponse: any = undefined;
 		try {
+			console.log(response.choices.at(0));
 			if (response.choices[0]?.message.content) {
 				const parsedResponse = extractJsonFromMarkdown(response.choices[0].message.content);
 
