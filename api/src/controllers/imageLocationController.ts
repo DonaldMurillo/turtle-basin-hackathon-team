@@ -3,6 +3,7 @@ import datasetsClient from '@mapbox/mapbox-sdk/services/datasets';
 import { clsx, type ClassValue } from 'clsx';
 import { Request, Response } from 'express';
 import { Feature } from 'geojson';
+import OpenAI from 'openai';
 import { twMerge } from 'tailwind-merge';
 import { v4 as uuidv4 } from 'uuid';
 const MILES_TO_KILOMETERS = 1.60934;
@@ -101,6 +102,27 @@ export const submitImageLocation = async (req: Request, res: Response) => {
 		//     userId: req.user.id, // Assuming you have user authentication in place
 		//   },
 		// });
+		const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+		const response = await openai.chat.completions.create({
+			model: 'gpt-4o-mini',
+			messages: [
+				{
+					role: 'user',
+					content: [
+						{ type: 'text', text: 'What’s in this image?' },
+						{
+							type: 'image_url',
+							image_url: {
+								url: `data:image/jpeg;base64,${image}`,
+							},
+						},
+					],
+				},
+			],
+		});
+
+		console.log(response);
 
 		res.status(200).json({ message: 'Image and location submitted successfully' });
 	} catch (error) {
